@@ -6,6 +6,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 import styles from './Todo.module.css';
 
 export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
@@ -94,12 +96,12 @@ export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
                 />
                 <Tooltip title="Save">
                   <IconButton aria-label="save group name" onClick={() => saveGroupName(index)} className="text-green-500">
-                    <EditIcon />
+                    <SaveIcon />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Cancel">
                   <IconButton aria-label="cancel edit" onClick={cancelEditing} className="text-red-500">
-                    <DeleteIcon />
+                    <CancelIcon />
                   </IconButton>
                 </Tooltip>
               </div>
