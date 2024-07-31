@@ -50,6 +50,26 @@ export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
     }
   };
 
+  // Handle keyboard events
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (editIndex !== null) {
+        if (e.key === 'Enter') {
+          saveGroupName(editIndex);
+        }
+        if (e.key === 'Escape') {
+          cancelEditing();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editIndex, editGroupName, taskGroups]);
+
   return (
     <div className="flex flex-col justify-between p-4 w-[300px] bg-gray-700 rounded-md">
       <div className="flex items-center justify-between space-x-2 mb-4">

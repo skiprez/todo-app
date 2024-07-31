@@ -65,6 +65,28 @@ export default function TodoMain({ selectedGroupIndex, taskGroups, setTaskGroups
     setTaskGroups(updatedGroups);
   };
 
+  // Handle keyboard events
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedGroupIndex !== null) {
+        if (editIndex !== null) {
+          if (e.key === 'Enter') {
+            saveTask(editIndex);
+          }
+          if (e.key === 'Escape') {
+            cancelEditing();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedGroupIndex, editIndex, editTask, taskGroups]);
+
   if (selectedGroupIndex === null || taskGroups.length === 0) {
     return <div className="p-4 text-gray-200">Select a task group from the menu.</div>;
   }
