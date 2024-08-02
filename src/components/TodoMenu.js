@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { IconButton, TextField, Button, Tooltip } from '@mui/material';
+import { motion } from 'framer-motion';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -50,7 +51,6 @@ export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
     }
   };
 
-  // Handle keyboard events
   React.useEffect(() => {
     const handleKeyDown = (e) => {
       if (editIndex !== null) {
@@ -81,10 +81,13 @@ export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
 
       <ul className={`list-none p-0 overflow-y-auto max-h-[400px] ${styles.customScrollbar}`}>
         {taskGroups.map((group, index) => (
-          <li
+          <motion.li
             key={index}
             className="flex justify-between items-center bg-gray-800 hover:bg-gray-600 cursor-pointer ease-in-out transition-colors duration-300 p-2 rounded mb-2"
             onClick={() => onGroupSelect(index)}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
           >
             {editIndex === index ? (
               <div className="flex items-center w-full">
@@ -142,7 +145,7 @@ export default function TodoMenu({ taskGroups, setTaskGroups, onGroupSelect }) {
                 </div>
               </div>
             )}
-          </li>
+          </motion.li>
         ))}
       </ul>
 

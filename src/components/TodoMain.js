@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { IconButton, TextField, Button, Checkbox } from '@mui/material';
+import { motion } from 'framer-motion';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
@@ -15,7 +16,6 @@ export default function TodoMain({ selectedGroupIndex, taskGroups, setTaskGroups
 
   useEffect(() => {
     if (selectedGroupIndex !== null) {
-      // Load tasks for the selected group
       setEditIndex(null);
       setEditTask('');
     }
@@ -65,17 +65,14 @@ export default function TodoMain({ selectedGroupIndex, taskGroups, setTaskGroups
     setTaskGroups(updatedGroups);
   };
 
-  // Handle keyboard events
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (selectedGroupIndex !== null) {
-        if (editIndex !== null) {
-          if (e.key === 'Enter') {
-            saveTask(editIndex);
-          }
-          if (e.key === 'Escape') {
-            cancelEditing();
-          }
+      if (editIndex !== null) {
+        if (e.key === 'Enter') {
+          saveTask(editIndex);
+        }
+        if (e.key === 'Escape') {
+          cancelEditing();
         }
       }
     };
@@ -85,128 +82,128 @@ export default function TodoMain({ selectedGroupIndex, taskGroups, setTaskGroups
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedGroupIndex, editIndex, editTask, taskGroups]);
-
-  if (selectedGroupIndex === null || taskGroups.length === 0) {
-    return <div className="p-4 text-gray-200">Select a task group from the menu.</div>;
-  }
-
-  const currentGroup = taskGroups[selectedGroupIndex];
-
-  // Ensure currentGroup is valid
-  if (!currentGroup) {
-    return <div className="p-4 text-gray-200">Selected task group not found.</div>;
-  }
+  }, [editIndex, editTask, taskGroups]);
 
   return (
-    <div className="p-4 w-[900px] rounded-md flex flex-col justify-between">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-gray-200">{currentGroup.name}</h1>
-        <p className="text-gray-400">Tasks for the selected group.</p>
-      </div>
+    <div className="p-4 flex-grow bg-gray-800 rounded-md">
+      {selectedGroupIndex === null || !taskGroups[selectedGroupIndex] ? (
+        <div className="text-gray-200 text-lg">Please select a task group to view tasks.</div>
+      ) : (
+        <>
+          <h3 className="text-xl font-semibold text-gray-200">{taskGroups[selectedGroupIndex].name}</h3>
+          <h3 className="text-sm font-semibold text-gray-500 mb-4">Below you can add tasks to your group!</h3>
+          <ul className={`list-none p-0 ${styles.customScrollbar}`} style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            {taskGroups[selectedGroupIndex].tasks.map((task, taskIndex) => (
+              <motion.li
+                key={taskIndex}
+                className="flex justify-between items-center bg-gray-700 hover:bg-gray-600 cursor-pointer ease-in-out transition-colors duration-300 p-2 rounded mb-2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+              >
+                {editIndex === taskIndex ? (
+                  <div className="flex items-center w-full">
+                    <TextField
+                      variant="outlined"
+                      size="small"
+                      value={editTask}
+                      onChange={(e) => setEditTask(e.target.value)}
+                      className="flex-grow mr-2"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderColor: 'white',
+                          },
+                          '&:hover fieldset': {
+                            borderColor: 'rgb(59 130 246)',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: 'rgb(59 130 246)',
+                          },
+                        },
+                        '& .MuiInputLabel-root': {
+                          color: 'white',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: 'white',
+                        },
+                      }}
+                    />
+                    <IconButton aria-label="save task" onClick={() => saveTask(taskIndex)} className="text-green-500">
+                      <SaveIcon />
+                    </IconButton>
+                    <IconButton aria-label="cancel edit" onClick={cancelEditing} className="text-red-500">
+                      <CancelIcon />
+                    </IconButton>
+                  </div>
+                ) : (
+                  <div className="flex items-center w-full justify-between">
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={task.completed}
+                        onChange={() => toggleComplete(taskIndex)}
+                        sx={{
+                          color: 'white',
+                          '&.Mui-checked': {
+                            color: 'rgb(59 130 246)',
+                          },
+                        }}
+                      />
+                      <span className={`text-gray-200 ${task.completed ? 'line-through' : ''}`}>{task.text}</span>
+                    </div>
+                    <div className="flex space-x-2 ml-4">
+                      <IconButton aria-label="edit task" onClick={() => startEditing(taskIndex)} className="text-yellow-500">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton aria-label="delete task" onClick={() => deleteTask(taskIndex)} className="text-red-500">
+                        <DeleteIcon />
+                      </IconButton>
+                    </div>
+                  </div>
+                )}
+              </motion.li>
+            ))}
+          </ul>
 
-      <ul className={`list-none p-0 max-h-[300px] overflow-y-auto ${styles.customScrollbar}`}>
-        {currentGroup.tasks.map((task, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between bg-gray-700 p-2 rounded last:border-b-0 mb-2"
-          >
-            {editIndex === index ? (
-              <div className="flex items-center w-full">
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  value={editTask}
-                  onChange={(e) => setEditTask(e.target.value)}
-                  className="flex-grow mr-2"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'white',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'rgb(59 130 246)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'rgb(59 130 246)',
-                      },
-                    },
-                    '& .MuiInputLabel-root': {
-                      color: 'white',
-                    },
-                    '& .MuiInputBase-input': {
-                      color: 'white',
-                    },
-                  }}
-                />
-                <IconButton aria-label="save task" onClick={() => saveTask(index)} className="text-green-500">
-                  <SaveIcon />
-                </IconButton>
-                <IconButton aria-label="cancel edit" onClick={cancelEditing} className="text-red-500">
-                  <CancelIcon />
-                </IconButton>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center w-full">
-                  <Checkbox
-                    checked={task.completed}
-                    onChange={() => toggleComplete(index)}
-                    className="mr-2"
-                  />
-                  <span className={`text-gray-200 ${task.completed ? 'line-through' : ''}`}>{task.text}</span>
-                </div>
-                <div className="flex space-x-2">
-                  <IconButton aria-label="edit task" onClick={() => startEditing(index)} className="text-yellow-500">
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton aria-label="delete task" onClick={() => deleteTask(index)} className="text-red-500">
-                    <DeleteIcon />
-                  </IconButton>
-                </div>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-4 max-w-[250px]">
-        <TextField
-          label="New Task"
-          variant="outlined"
-          size="small"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          className="w-full mb-2"
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'white',
-              },
-              '&:hover fieldset': {
-                borderColor: 'rgb(59 130 246)',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: 'rgb(59 130 246)',
-              },
-            },
-            '& .MuiInputLabel-root': {
-              color: 'white',
-            },
-            '& .MuiInputBase-input': {
-              color: 'white',
-            },
-          }}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addTask}
-          className="w-full"
-        >
-          Add Task
-        </Button>
-      </div>
+          <div className="mt-4 flex flex-col">
+            <TextField
+              label="New Task"
+              variant="outlined"
+              size="small"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              className="w-[250px] mb-2"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'white',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgb(59 130 246)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'rgb(59 130 246)',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'white',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={addTask}
+              className="w-[150px]"
+            >
+              Add Task
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
