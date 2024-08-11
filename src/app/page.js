@@ -10,9 +10,6 @@ export default function ParentComponent() {
   const [taskGroups, setTaskGroups] = useState([]);
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(null);
 
-  // useEffect(() => {
-  // }, []);
-
   const handleGroupSelect = (index) => {
     setSelectedGroupIndex(index);
   };
@@ -34,7 +31,17 @@ export default function ParentComponent() {
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
-          setTaskGroups(data);
+  
+          // Handle missing tags in old data
+          const updatedData = data.map(group => ({
+            ...group,
+            tasks: group.tasks.map(task => ({
+              ...task,
+              tags: task.tags || [],  // Initialize tags if not present
+            }))
+          }));
+  
+          setTaskGroups(updatedData);
           alert('Data loaded successfully!');
         } catch (error) {
           alert('Error loading data: Invalid JSON');
@@ -43,7 +50,7 @@ export default function ParentComponent() {
       };
       reader.readAsText(file);
     }
-  };
+  };  
 
   return (
     <div className="flex flex-row bg-gray-800 w-[1200px] h-[600px] rounded-md shadow-2xl relative">
